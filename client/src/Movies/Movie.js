@@ -1,4 +1,5 @@
 import React from "react";
+import {Link} from "react-router-dom"
 import axios from "axios";
 import MovieCard from "./MovieCard";
 export default class Movie extends React.Component {
@@ -13,6 +14,13 @@ export default class Movie extends React.Component {
     this.fetchMovie(this.props.match.params.id);
   }
 
+  componentDidUpdate() {
+    const needUpdate = localStorage.getItem("needUpdate")
+    if(needUpdate) {
+      this.fetchMovie(this.props.match.params.id)
+    }
+  }
+
   componentWillReceiveProps(newProps) {
     if (this.props.match.params.id !== newProps.match.params.id) {
       this.fetchMovie(newProps.match.params.id);
@@ -22,7 +30,10 @@ export default class Movie extends React.Component {
   fetchMovie = id => {
     axios
       .get(`http://localhost:5000/api/movies/${id}`)
-      .then(res => this.setState({ movie: res.data }))
+      .then(res => {
+        this.setState({ movie: res.data })
+        localStorage.setItem("needUpdate",false)      
+      })
       .catch(err => console.log(err.response));
   };
 
@@ -30,6 +41,19 @@ export default class Movie extends React.Component {
     const addToSavedList = this.props.addToSavedList;
     addToSavedList(this.state.movie);
   };
+
+  editMovie = () => {
+    this.props.history.push(`/update-movie/${this.state.movie.id}`)
+  };
+
+  deleteMovie = () => {
+    axios
+      .delete(`http://localhost:5000/api/movies/${this.state.movie.id}`)
+      .then(res => console.log(res), "Success")
+      .catch(err => console.log(err))
+    localStorage.setItem("needUpdate", true)
+    this.props.history.push("/")
+  }
 
   render() {
     if (!this.state.movie) {
@@ -42,6 +66,8 @@ export default class Movie extends React.Component {
         <div className="save-button" onClick={this.saveMovie}>
           Save
         </div>
+        <button onClick={this.editMovie}>Edit</button>
+        <button onClick={this.deleteMovie}>Delete</button>
       </div>
     );
   }
