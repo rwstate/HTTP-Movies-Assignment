@@ -17,6 +17,16 @@ export default class MovieList extends Component {
       .catch(err => console.log(err.response));
   }
 
+  componentDidUpdate() {
+    const needUpdate = localStorage.getItem("needUpdate")
+    if(needUpdate) {
+      axios
+      .get("http://localhost:5000/api/movies")
+      .then(res => this.setState({ movies: res.data }))
+      .catch(err => console.log(err.response));
+    }
+  }
+
   render() {
     return (
       <div className="movie-list">

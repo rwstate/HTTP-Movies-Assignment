@@ -75,3 +75,13 @@ body {
   color: red;
   text-align: center;
 }
+
+.update-form {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  margin-left: 10%;
+}
+.update-form button {
+  width: 20%;
+}
